@@ -1,0 +1,22 @@
+{
+  "name": "fingera-status",
+  "main": "./lib/fingera",
+  "version": "0.0.1",
+  "description": "Displays your attendance info from Fingeraa in the Atom status bar.",
+  "keywords": [
+  ],
+  "repository": "https://github.com/atom/atom-fingera",
+  "license": "MIT",
+  "engines": {
+    "atom": ">=1.0.0 <2.0.0"
+  },
+  "consumedServices": {
+      "status-bar": {
+          "versions": {
+              "^1.0.0": "consumeStatusBar"
+          }
+      }
+ },
+  "dependencies": {
+  }
+}
