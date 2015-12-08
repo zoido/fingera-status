@@ -10,9 +10,6 @@ class AtomFingeraView extends HTMLElement
         @arrival = @querySelector("span span:nth-child(2)")
         @delta = @querySelector("span span:nth-child(1)")
 
-        console.log @arrival_tip
-
-
     activate: ->
         @updateDelta()
         @updateArrival()
@@ -25,18 +22,13 @@ class AtomFingeraView extends HTMLElement
         clearInterval @intervalArrivalId
 
     updateArrival: ->
-        show_arrival = atom.config.get('fingera.status.show_arrival')
+        show_arrival = atom.config.get('fingera-status.show_arrival')
         if not show_arrival
-            arrival.innerHTML = ""
+            @arrival.innerHTML = ""
             return
 
-        host = atom.config.get('fingera.status.host')
-        user_number = atom.config.get('fingera.status.user_number')
-
-
-        # https://regex101.com/r/kM1oL0/3
-        arrival_regexp_string = "<div id=\"user_status_info_#{user_number}([\\s\\S]+?)v práci od (\\d+:\\d+)"
-        arrival_regexp = new RegExp(arrival_regexp_string, 'im')
+        host = atom.config.get('fingera-status.host')
+        user_number = atom.config.get('fingera-status.user_number')
 
         request = new XMLHttpRequest()
         url = "http://#{host}/users_summary"
@@ -46,11 +38,16 @@ class AtomFingeraView extends HTMLElement
 
         request.onload = ->
             if (request.status >= 200) and (request.status < 400)
-                # SUCCESS
                 raw_data = request.responseText
 
-                arrival_value = arrival_regexp.exec(raw_data)?[2]
-                if arrival_value.length < 1
+                # Parse response
+                html = document.createElement("html")
+                html.innerHTML = raw_data
+                selector = "div#user_status_info_#{user_number} p.status-info a"
+                arrival_text = html.querySelector(selector).innerText
+                arrival_value = /\d+:\d+/.exec(arrival_text)?[0]
+
+                if (not arrival_value?) or (arrival_value.length < 1)
                     arrival.innerHTML = """ |
                         <span class="icon-sign-out text-warning"></span>
                     """
@@ -110,10 +107,8 @@ class AtomFingeraView extends HTMLElement
         request.send()
 
     updateDelta: ->
-        host = atom.config.get('fingera.status.host')
-        user_number = atom.config.get('fingera.status.user_number')
-
-        delta_regexp = new RegExp("(.*>)(.+)(<\/a>\\n<\/span>)", 'igm')
+        host = atom.config.get('fingera-status.host')
+        user_number = atom.config.get('fingera-status.user_number')
 
         request = new XMLHttpRequest()
         url = "http://#{host}/users_summary/toggle_user_status/#{user_number}?show_worktime=1"
@@ -123,9 +118,13 @@ class AtomFingeraView extends HTMLElement
         delta = @delta
         request.onload = ->
             if (request.status >= 200) and (request.status < 400)
-                # SUCCESS
-
                 raw_data = request.responseText
+
+                # Parse response
+                # html = document.createElement("html")
+                # html.innerHTML = raw_data
+                # selector = 'a[title="Zobrazit stav"]'
+                # data_value = html.querySelector(selector).innerText
 
                 data_value = /(.*>)(.+)(<\/a>\\n<\/span>)/im.exec(raw_data)[2]
                 delta_value = data_value.split("/")[1].replace(/^\s+|\s+$/g, '')
