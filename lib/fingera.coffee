@@ -15,6 +15,10 @@ module.exports = AtomFingera =
         show_arrival:
             type: 'boolean'
             default: true
+        arrival_timer:
+            type: 'integer'
+            default: 60
+            min: 0
 
     activate: (state)->
         @state = state

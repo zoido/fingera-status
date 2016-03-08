@@ -2,7 +2,7 @@
   "name": "fingera-status",
   "main": "./lib/fingera",
   "version": "0.0.1",
-  "description": "Displays your attendance info from Fingeraa in the Atom status bar.",
+  "description": "Displays your attendance info from Fingera in the Atom status bar.",
   "keywords": [
   ],
   "repository": "https://github.com/atom/atom-fingera",
